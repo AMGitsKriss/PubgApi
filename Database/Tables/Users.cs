@@ -33,10 +33,6 @@ namespace Database.Tables
                 while (reader.Read())
                 {
                     PubgUserModel user = new PubgUserModel();
-                    user.pubg_username = reader.GetValue(0).ToString();
-                    user.pubg_user_id = reader.GetValue(1).ToString();
-                    userList.Add(user);
-
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
                         var value = reader.GetValue(i);
@@ -44,6 +40,7 @@ namespace Database.Tables
                         PropertyInfo propertyInfo = user.GetType().GetProperty(propName);
                         propertyInfo.SetValue(user, value);
                     }
+                    userList.Add(user);
                 }
                 return userList;
             }
