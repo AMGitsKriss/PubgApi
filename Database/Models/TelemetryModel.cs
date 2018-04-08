@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Database.Models
 {
-    public class Telemetry
+    public class TelemetryModel
     {
         public string matchId { get; set; }
         public string eventType { get; set; }
@@ -36,6 +36,17 @@ namespace Database.Models
         public int? attackId { get; set; }
         public string damageReason { get; set; }
         public float? damage { get; set; }
+        public string pingQuality { get; set; }
+        public string itemId { get; set; }
+        public int stackCount { get; set; }
+        public string category { get; set; }
+        public string subCategory { get; set; }
+        public string attachments { get; set; }
+        public string attackType { get; set; }
+        public string vehicleId { get; set; }
+        public string vehicleType { get; set; }
+        public float healthPercent { get; set; }
+        public float fuelPercent { get; set; }
     }
 
 }

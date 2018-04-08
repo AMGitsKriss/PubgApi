@@ -6,7 +6,14 @@ namespace PubgApi
 {
     public class LogFactory
     {
-        public Telemetry LogPlayerTakeDamage(Telemetry entryObj, JToken entry)
+        private string MatchId { get; set; }
+
+        public LogFactory(string matchId)
+        {
+            MatchId = matchId;
+        }
+
+        public TelemetryModel LogPlayerTakeDamage(TelemetryModel entryObj, JToken entry)
         {
             entryObj.attackId = entry["attackId"].ToObject<int>();
 
@@ -21,7 +28,7 @@ namespace PubgApi
             return entryObj;
         }
 
-        public Telemetry LogPlayerKill(Telemetry entryObj, JToken entry)
+        public TelemetryModel LogPlayerKill(TelemetryModel entryObj, JToken entry)
         {
             entryObj.attackId = entry["attackId"].ToObject<int>();
 
@@ -52,7 +59,7 @@ namespace PubgApi
             return entryObj;
         }
 
-        public Telemetry LogPlayerPosition(Telemetry entryObj, JToken entry)
+        public TelemetryModel LogPlayerPosition(TelemetryModel entryObj, JToken entry)
         {
             entryObj = VictimFields(entryObj, entry["character"]);
 
@@ -62,82 +69,86 @@ namespace PubgApi
             return entryObj;
         }
 
-        //TODO 
-        public Telemetry LogMatchDefinition(Telemetry entryObj, JToken entry)
+        public TelemetryModel LogMatchDefinition(TelemetryModel entryObj, JToken entry)
         {
+            entryObj.pingQuality = entry["PingQuality"].ToString();
             return entryObj;
         }
 
-        //TODO 
-        public Telemetry LogMatchStart(Telemetry entryObj, JToken entry)
+        public TelemetryModel LogItemPickup(TelemetryModel entryObj, JToken entry)
         {
+            return CharacterItemFields(entryObj, entry);
+        }
+
+        public TelemetryModel LogItemUse(TelemetryModel entryObj, JToken entry)
+        {
+            return CharacterItemFields(entryObj, entry);
+        }
+
+        public TelemetryModel LogItemEquip(TelemetryModel entryObj, JToken entry)
+        {
+            return CharacterItemFields(entryObj, entry);
+        }
+ 
+        public TelemetryModel LogItemUnequip(TelemetryModel entryObj, JToken entry)
+        {
+            return CharacterItemFields(entryObj, entry);
+        }
+
+        public TelemetryModel LogPlayerAttack(TelemetryModel entryObj, JToken entry)
+        {
+            entryObj.attackId = entry["attackId"].ToObject<int>();
+            entryObj.attackType = entry["attackType"].ToString();
+            entryObj = AttackerFields(entryObj, entry["attacker"]);
+            entryObj = ItemFields(entryObj, entry["weapon"]);
             return entryObj;
         }
 
-        //TODO 
-        public Telemetry LogItemPickup(Telemetry entryObj, JToken entry)
+        public TelemetryModel LogVehicleRide(TelemetryModel entryObj, JToken entry)
         {
+            return CharacterVehicleFields(entryObj, entry);
+        }
+
+        public TelemetryModel LogVehicleLeave(TelemetryModel entryObj, JToken entry)
+        {
+            return CharacterVehicleFields(entryObj, entry);
+        }
+
+        public TelemetryModel LogVehicleDestroy(TelemetryModel entryObj, JToken entry)
+        {
+            entryObj.attackId = entry["attackId"].ToObject<int>();
+            entryObj = AttackerFields(entryObj, entry["attacker"]);
+            entryObj = VehicleFields(entryObj, entry["vehicle"]);
+
+            entryObj.damageCauserName = entry["damageCauserName"].ToString();
+            entryObj.damageTypeCategory = entry["damageTypeCategory"].ToString();
+            entryObj.distance = entry["distance"].ToObject<float>();
+
             return entryObj;
         }
 
-        //TODO 
-        public Telemetry LogItemUse(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
-        public Telemetry LogItemEquip(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
-        public Telemetry LogItemUnequip(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
-        public Telemetry LogMatchEnd(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
-        public Telemetry LogPlayerAttack(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
-        public Telemetry LogVehicleRide(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
-        public Telemetry LogVehicleLeave(Telemetry entryObj, JToken entry)
-        {
-            return entryObj;
-        }
-
-        //TODO 
+        /*//TODO - Unimplimented log object 
         public Telemetry LogCarePackageLand(Telemetry entryObj, JToken entry)
         {
             return entryObj;
-        }
+        }*/
 
-        //TODO 
-        public Telemetry LogVehicleDestroy(Telemetry entryObj, JToken entry)
+        /*// TODO - Unimplimented log object 
+        public Telemetry LogMatchStart(Telemetry entryObj, JToken entry)
         {
             return entryObj;
-        }
+        }*/
+
+        /*//TODO - Unimplimented log object 
+        public Telemetry LogMatchEnd(Telemetry entryObj, JToken entry)
+        {
+            return entryObj;
+        }*/
 
         /// <summary>
         /// The standard character field, or the person getting shot at.
         /// </summary>
-        private Telemetry VictimFields(Telemetry entryObj, JToken victim)
+        private TelemetryModel VictimFields(TelemetryModel entryObj, JToken victim)
         {
             entryObj.victimName = victim["name"].ToString();
             entryObj.victimTeamId = victim["teamId"].ToObject<int>();
@@ -154,7 +165,7 @@ namespace PubgApi
         /// <summary>
         /// The person doing the shooting.
         /// </summary>
-        private Telemetry AttackerFields(Telemetry entryObj, JToken attacker)
+        private TelemetryModel AttackerFields(TelemetryModel entryObj, JToken attacker)
         {
             entryObj.attackerName = attacker["name"].ToString();
             entryObj.attackerTeamId = attacker["teamId"].ToObject<int>();
@@ -164,6 +175,68 @@ namespace PubgApi
             entryObj.attackerX = attacker["location"]["x"].ToObject<float>();
             entryObj.attackerY = attacker["location"]["y"].ToObject<float>();
             entryObj.attackerZ = attacker["location"]["z"].ToObject<float>();
+
+            return entryObj;
+        }
+
+        /// <summary>
+        /// Data about an item/weapon interaction.
+        /// </summary>
+        private TelemetryModel ItemFields(TelemetryModel entryObj, JToken item)
+        {
+            entryObj.itemId = item["itemId"].ToString();
+            entryObj.stackCount = item["stackCount"].ToObject<int>();
+            entryObj.category = item["category"].ToString();
+            entryObj.subCategory = item["subCategory"].ToString();
+            var tmp = item["attachments"].ToString();
+            entryObj.attachments = item["attachments"].ToString(); // TODO - This wants to be a comma delimited string.
+
+            return entryObj;
+        }
+
+        /// <summary>
+        /// Data about an item/weapon interaction.
+        /// </summary>
+        private TelemetryModel VehicleFields(TelemetryModel entryObj, JToken item)
+        {
+            entryObj.vehicleType = item["vehicleType"].ToString();
+            entryObj.vehicleId = item["vehicleId"].ToString();
+            entryObj.healthPercent = item["healthPercent"].ToObject<float>();
+            entryObj.fuelPercent = item["fuelPercent"].ToObject<float>();
+
+            return entryObj;
+        }
+
+        /// <summary>
+        /// Data about an vehicle interaction.
+        /// </summary>
+        public TelemetryModel CharacterVehicleFields(TelemetryModel entryObj, JToken entry)
+        {
+            entryObj = VictimFields(entryObj, entry["character"]);
+            entryObj = VehicleFields(entryObj, entry["vehicle"]);
+            return entryObj;
+        }
+
+        /// <summary>
+        /// A number of log items contain only a character and item detail.
+        /// </summary>
+        private TelemetryModel CharacterItemFields(TelemetryModel entryObj, JToken entry)
+        {
+            entryObj = VictimFields(entryObj, entry["character"]);
+            entryObj = ItemFields(entryObj, entry["item"]);
+            return entryObj;
+        }
+
+        /// <summary>
+        /// Type, Date and Version of this object.
+        /// </summary>
+        public TelemetryModel MetaFields(TelemetryModel entryObj, JToken data)
+        {
+            entryObj.eventType = data["_T"].ToString();
+            entryObj.timestamp = data["_D"].ToObject<DateTime>();
+            entryObj.version = data["_V"].ToString();
+
+            entryObj.matchId = MatchId.ToString();
 
             return entryObj;
         }

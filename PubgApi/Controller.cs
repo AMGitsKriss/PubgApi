@@ -45,10 +45,13 @@ namespace PubgApi
                         string matchTelemetry;
                         List<MatchParticipantModel> players = ParseMatch(match, out matchTelemetry);
                         
-                        // Get telemetry?
-                        // _T is the type
+                        // Get telemetry
                         JArray telemetry = api.MatchTelemetry(matchTelemetry);
-                        List<Telemetry> events = ParseTelemetry(telemetry);
+                        List<TelemetryModel> events = ParseTelemetry(telemetry, matchId);
+
+                        // TODO - Now that he have Match and Events, we need to parse them into their respective tables.
+                        // Transactions?
+                        db.InsertMatch(players, events);
                     }
                 }
             }
@@ -127,28 +130,32 @@ namespace PubgApi
             return participantList;
         }
 
-        public List<Telemetry> ParseTelemetry(JArray telemetry)
+        public List<TelemetryModel> ParseTelemetry(JArray telemetry, string matchId)
         {
-            List<Telemetry> matchLog = new List<Telemetry>();
+            List<TelemetryModel> matchLog = new List<TelemetryModel>();
             foreach (JToken entry in telemetry)
             {
-                Telemetry entryObj = new Telemetry();
-                LogFactory lf = new LogFactory();
-                // Big ugly block of event assignments
-
-                entryObj.eventType = entry["_T"].ToString();
-                entryObj.timestamp = entry["_D"].ToObject<DateTime>();
-                entryObj.version = entry["_V"].ToString();
-
-                Type lfType = lf.GetType();
+                TelemetryModel entryObj = new TelemetryModel();
+                LogFactory factory = new LogFactory(matchId);
+                
+                // Event assignments
+                // TODO - This is going to fail on some events, as they've not been implimented.
+                entryObj = factory.MetaFields(entryObj, entry);
+                Type lfType = factory.GetType();
                 MethodInfo typeMethod = lfType.GetMethod(entryObj.eventType);
                 if(typeMethod != null)
                 {
-                    entryObj = (Telemetry)typeMethod.Invoke(lf, new object[] { entryObj, entry });
+                    try
+                    {
+                        entryObj = (TelemetryModel)typeMethod.Invoke(factory, new object[] { entryObj, entry });
+                    }
+                    catch (NotImplementedException)
+                    {
+                        Console.WriteLine(string.Format("The method {0} has not yet been implimented.", entryObj.eventType));
+                    }
                     matchLog.Add(entryObj);
                 }
             }
-
             return matchLog;
         }
     }
