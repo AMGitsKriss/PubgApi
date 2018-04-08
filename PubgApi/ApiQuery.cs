@@ -35,6 +35,13 @@ namespace PubgApi
             return userObject;
         }
 
+        public JArray MatchTelemetry(string telemetryUrl) // Repition of above
+        {
+            string response = MakeString(MakeRequest("", telemetryUrl));
+            JArray userObject = JArray.Parse(response);
+            return userObject;
+        }
+        
         private HttpWebRequest MakeRequest(string uri, string userId)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri + userId);

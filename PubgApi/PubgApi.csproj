@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="ApiQuery.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="LogFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,6 +61,9 @@
       <Project>{15992d16-ce9e-4dc7-a9ab-e7ae5b5920cf}</Project>
       <Name>Database</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

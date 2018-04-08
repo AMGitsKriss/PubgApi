@@ -10,6 +10,7 @@ namespace Database
         MySqlConnection conn;
 
         public UsersTable Users;
+        public MatchParticipantsTable MatchParticipants;
 
         // Establish the database connection object
         public DatabaseConnection()
@@ -24,6 +25,7 @@ namespace Database
                 conn.Open();
                 Console.WriteLine("Connected to database.");
                 Users = new UsersTable(conn);
+                MatchParticipants = new MatchParticipantsTable(conn);
             }
             catch (MySqlException ex)
             {

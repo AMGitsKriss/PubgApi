@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Reflection;
 using Database;
 using Database.Models;
 using Newtonsoft.Json.Linq;
@@ -31,13 +33,28 @@ namespace PubgApi
 
             foreach (var user in users)
             {
-                //JObject player = api.PlayerData(user.pubg_user_id);
+                JObject player = api.PlayerData(user.pubg_user_id);
+                foreach (JObject playerMatche in player["data"]["relationships"]["matches"]["data"])
+                {
+                    string matchId = playerMatche["id"].ToString();
+                    if (!db.MatchParticipants.MatchExists(matchId))
+                    {
+                        // The match doesn't exist. 
+                        // We can go get the data for it.
+                        JObject match = api.MatchData(matchId);
+                        string matchTelemetry;
+                        List<MatchParticipantModel> players = ParseMatch(match, out matchTelemetry);
+                        
+                        // Get telemetry?
+                        // _T is the type
+                        JArray telemetry = api.MatchTelemetry(matchTelemetry);
+                        List<Telemetry> events = ParseTelemetry(telemetry);
+                    }
+                }
             }
-            JObject match = api.MatchData("711ee4d2-7c44-4559-9353-a0e3d749fb38");
-            var a = ParseMatch(match);
         }
 
-        List<MatchParticipantModel> ParseMatch(JObject match)
+        List<MatchParticipantModel> ParseMatch(JObject match, out string telemetry)
         {
             /*
              * Accept a match json object and pull out the important bits.
@@ -47,6 +64,7 @@ namespace PubgApi
              */
             string matchType = match["data"]["type"].ToString();
             string matchId = match["data"]["id"].ToString();
+            telemetry = string.Empty;
 
             List<MatchParticipantModel> participantList = new List<MatchParticipantModel>();
 
@@ -62,6 +80,10 @@ namespace PubgApi
                         string participantId = player["id"].ToString();
                         teamsDict.Add(participantId, teamId);
                     }
+                }
+                if (rosterItem["type"].ToString().Equals("asset"))
+                {
+                    telemetry = rosterItem["attributes"]["URL"].ToString();
                 }
             }
 
@@ -103,6 +125,31 @@ namespace PubgApi
                 }
             }
             return participantList;
+        }
+
+        public List<Telemetry> ParseTelemetry(JArray telemetry)
+        {
+            List<Telemetry> matchLog = new List<Telemetry>();
+            foreach (JToken entry in telemetry)
+            {
+                Telemetry entryObj = new Telemetry();
+                LogFactory lf = new LogFactory();
+                // Big ugly block of event assignments
+
+                entryObj.eventType = entry["_T"].ToString();
+                entryObj.timestamp = entry["_D"].ToObject<DateTime>();
+                entryObj.version = entry["_V"].ToString();
+
+                Type lfType = lf.GetType();
+                MethodInfo typeMethod = lfType.GetMethod(entryObj.eventType);
+                if(typeMethod != null)
+                {
+                    entryObj = (Telemetry)typeMethod.Invoke(lf, new object[] { entryObj, entry });
+                    matchLog.Add(entryObj);
+                }
+            }
+
+            return matchLog;
         }
     }
 }

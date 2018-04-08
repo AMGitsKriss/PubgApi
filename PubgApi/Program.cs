@@ -9,7 +9,7 @@ namespace PubgApi
         {
             Controller main = new Controller();
 
-            Console.WriteLine("Press ESC to stop...");
+            Console.WriteLine("Press Enter to stop...");
             Console.ReadLine();
             /*
             do
