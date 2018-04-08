@@ -34,6 +34,6 @@ namespace Database.Models
         public int winPlace { get; set; }
         public int kills { get; set; }
         public string match_type { get; set; }
-        public string mayName { get; set; }
+        public string mapName { get; set; }
     }
 }

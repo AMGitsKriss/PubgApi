@@ -29,35 +29,47 @@ namespace PubgApi
             db = new DatabaseConnection();
             api = new ApiQuery(ConfigurationManager.AppSettings.Get("ApiKey"));
 
-            List<PubgUserModel> users = db.Users.PubgUsers();
+            List<PubgUserModel> users = db.PubgUsers();
 
             foreach (var user in users)
             {
                 JObject player = api.PlayerData(user.pubg_user_id);
-                foreach (JObject playerMatche in player["data"]["relationships"]["matches"]["data"])
+                foreach (JObject playerMatch in player["data"]["relationships"]["matches"]["data"])
                 {
-                    string matchId = playerMatche["id"].ToString();
-                    if (!db.MatchParticipants.MatchExists(matchId))
+                    MatchModel matchListEntry = new MatchModel();
+                    matchListEntry.matchId = playerMatch["id"].ToString();
+                    string mapName;
+                    DateTime date;
+
+                    if (!db.MatchExists(matchListEntry.matchId))
                     {
+                        Console.WriteLine(string.Format("[{0}] Building match {1}", DateTime.Now, matchListEntry.matchId));
                         // The match doesn't exist. 
                         // We can go get the data for it.
-                        JObject match = api.MatchData(matchId);
+                        JObject match = api.MatchData(matchListEntry.matchId);
                         string matchTelemetry;
-                        List<MatchParticipantModel> players = ParseMatch(match, out matchTelemetry);
-                        
-                        // Get telemetry
-                        JArray telemetry = api.MatchTelemetry(matchTelemetry);
-                        List<TelemetryModel> events = ParseTelemetry(telemetry, matchId);
+                        Console.Write(string.Format("[{0}] Building player list... ", DateTime.Now));
+                        List<MatchParticipantModel> players = ParseMatch(match, out matchTelemetry, out mapName, out date);
+                        Console.WriteLine("Done");
+                        matchListEntry.mapName = mapName;
+                        matchListEntry.date = date;
 
-                        // TODO - Now that he have Match and Events, we need to parse them into their respective tables.
-                        // Transactions?
-                        db.InsertMatch(players, events);
+                        // Get telemetry
+                        Console.Write(string.Format("[{0}] Building telemetry... ", DateTime.Now));
+                        JArray telemetry = api.MatchTelemetry(matchTelemetry);
+                        List<TelemetryModel> events = ParseTelemetry(telemetry, matchListEntry.matchId);
+                        Console.WriteLine("Done");
+
+                        // Now that he have Match and Events, we need to parse them into their respective tables.
+                        Console.Write(string.Format("[{0}] Saving to Database... ", DateTime.Now));
+                        db.InsertMatch(matchListEntry, players, events);
+                        Console.WriteLine("Done");
                     }
                 }
             }
         }
 
-        List<MatchParticipantModel> ParseMatch(JObject match, out string telemetry)
+        List<MatchParticipantModel> ParseMatch(JObject match, out string telemetry, out string mapName, out DateTime date)
         {
             /*
              * Accept a match json object and pull out the important bits.
@@ -67,6 +79,8 @@ namespace PubgApi
              */
             string matchType = match["data"]["type"].ToString();
             string matchId = match["data"]["id"].ToString();
+            mapName = match["data"]["attributes"]["mapName"].ToString();
+            date = match["data"]["attributes"]["createdAt"].ToObject<DateTime>();
             telemetry = string.Empty;
 
             List<MatchParticipantModel> participantList = new List<MatchParticipantModel>();
@@ -122,7 +136,8 @@ namespace PubgApi
                         kills = attr["kills"].ToObject<int>(),
                         match_type = matchType,
                         matchId = matchId,
-                        teamId = teamsDict.Where(x => x.Key == rosterItem["id"].ToString()).SingleOrDefault().Value
+                        teamId = teamsDict.Where(x => x.Key == rosterItem["id"].ToString()).SingleOrDefault().Value,
+                        mapName = mapName
                     };
                     participantList.Add(player);
                 }

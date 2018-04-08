@@ -188,8 +188,8 @@ namespace PubgApi
             entryObj.stackCount = item["stackCount"].ToObject<int>();
             entryObj.category = item["category"].ToString();
             entryObj.subCategory = item["subCategory"].ToString();
-            var tmp = item["attachments"].ToString();
-            entryObj.attachments = item["attachments"].ToString(); // TODO - This wants to be a comma delimited string.
+            entryObj.attachments = string.Join(",", item["attachedItems"].ToObject<string[]>());
+            
 
             return entryObj;
         }
@@ -202,7 +202,7 @@ namespace PubgApi
             entryObj.vehicleType = item["vehicleType"].ToString();
             entryObj.vehicleId = item["vehicleId"].ToString();
             entryObj.healthPercent = item["healthPercent"].ToObject<float>();
-            entryObj.fuelPercent = item["fuelPercent"].ToObject<float>();
+            entryObj.fuelPercent = item["feulPercent"].ToObject<float>(); // This is a typo in the API that needs fixing
 
             return entryObj;
         }
