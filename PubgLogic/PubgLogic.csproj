@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{72BF9B0F-83B7-4A06-95AB-1CD34DE4ABBE}</ProjectGuid>
+    <ProjectGuid>{89D363B1-0DB0-4BF1-984B-09486776BEB9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PubgApi</RootNamespace>
-    <AssemblyName>PubgApi</AssemblyName>
+    <RootNamespace>PubgLogic</RootNamespace>
+    <AssemblyName>PubgLogic</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,11 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed" />
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,13 +41,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PubgApi.cs" />
+    <Compile Include="PubgStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Common\BaseApi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Database\Database.csproj">
+      <Project>{C31B948D-F8E9-4852-BAF6-378AE7B009FC}</Project>
+      <Name>Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PubgApi\PubgApi.csproj">
+      <Project>{72BF9B0F-83B7-4A06-95AB-1CD34DE4ABBE}</Project>
+      <Name>PubgApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RepositoryContracts\RepositoryContracts.csproj">
+      <Project>{2E8A2126-1C28-46A3-ABAC-A45980E70DC7}</Project>
+      <Name>RepositoryContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repository\Repository.csproj">
+      <Project>{2317D24F-E0E8-4D55-ACF4-185F7D13FB88}</Project>
+      <Name>Repository</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
