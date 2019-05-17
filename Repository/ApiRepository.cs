@@ -16,7 +16,7 @@ namespace Repository
         public ApiRepository()
         {
             ApiKey = ConfigurationManager.AppSettings.Get("ApiKey");
-            Host = ConfigurationManager.AppSettings.Get("HostUri");
+            Host = @"https://api.pubg.com/shards/steam/";
         }
 
         /// <summary>
