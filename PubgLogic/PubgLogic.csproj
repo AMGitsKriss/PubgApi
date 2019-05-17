@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PubgLogic</RootNamespace>
     <AssemblyName>PubgLogic</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,7 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed" />
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\PubgApi.Tests\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PubgKillGraph.cs" />
     <Compile Include="PubgStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -49,9 +53,9 @@
       <Project>{C31B948D-F8E9-4852-BAF6-378AE7B009FC}</Project>
       <Name>Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PubgApi\PubgApi.csproj">
-      <Project>{72BF9B0F-83B7-4A06-95AB-1CD34DE4ABBE}</Project>
-      <Name>PubgApi</Name>
+    <ProjectReference Include="..\PubgLogicContracts\PubgLogicContracts.csproj">
+      <Project>{A019C02A-A85A-406D-92C3-AEB8A9DC6EF0}</Project>
+      <Name>PubgLogicContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\RepositoryContracts\RepositoryContracts.csproj">
       <Project>{2E8A2126-1C28-46A3-ABAC-A45980E70DC7}</Project>

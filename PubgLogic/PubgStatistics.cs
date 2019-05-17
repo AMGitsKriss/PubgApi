@@ -1,6 +1,5 @@
 ﻿using Database;
 using Newtonsoft.Json.Linq;
-using PubgApi;
 using Repository;
 using RepositoryContracts;
 using System;
@@ -14,7 +13,7 @@ namespace PubgLogic
     public class PubgStatistics
     {
         IPubgRepository context = new PubgRepository();
-        PubgApi.PubgApi api = new PubgApi.PubgApi();
+        ApiRepository api = new ApiRepository();
 
         public PubgStatistics()
         {
